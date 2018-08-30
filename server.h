@@ -6,8 +6,8 @@ class server{
   int status;
  
  public:
-  server(int n);
+  server();
   int getStatus(void);
-  void setStatus(int n);
+  void setStatus(int);
 
-}
+};
