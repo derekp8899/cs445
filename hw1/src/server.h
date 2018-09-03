@@ -1,6 +1,5 @@
-#include "patient.h"
+//#include "patient.h"
 #include <vector>
-using namespace std;
 class server{
 
  private:
@@ -8,11 +7,17 @@ class server{
   int numInQ;
   double nextArr;
   double nextDep;
-  vector <patient>queue;
-  
+  double lArr;
+  double lServ;//lamda for the exponential distributions
+  //vector <patient>queue;
+  void genPatient();
+
  public:
-  server();
+  server(int,int);
   int getStatus(void);
   void setStatus(int);
+  double getArr(void);
+  double getDep(void);
+
 
 };
