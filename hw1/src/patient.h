@@ -9,10 +9,10 @@ class patient{
 
  public:
   patient();
-  void setArrive(double);
+  void setArrive(double,double);
   void setServiceTime(double);
   void setDepart(double);
-  double getArrival(void);
+  double getArrive(void);
   double getTotalTime(void);
 
 };

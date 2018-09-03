@@ -1,4 +1,4 @@
-//#include "patient.h"
+#include "patient.h"
 #include <vector>
 class server{
 
@@ -9,8 +9,8 @@ class server{
   double nextDep;
   double lArr;
   double lServ;//lamda for the exponential distributions
-  //vector <patient>queue;
-  void genPatient();
+  std::vector <patient>queue;
+  //void genPatient();
 
  public:
   server(int,int);
@@ -18,6 +18,9 @@ class server{
   void setStatus(int);
   double getArr(void);
   double getDep(void);
+  void genPatient(double);
+  double patientArr(int);
+
 
 
 };

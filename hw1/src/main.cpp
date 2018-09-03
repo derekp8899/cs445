@@ -1,14 +1,14 @@
 #include <iostream>
 #include <string>
 #include "control.h"
-#include "server.h"
+//#include "server.h"
 //#include "patient.h"
 
 using namespace std;
 int main(int argc, char* argv[]){
 
-  server a(stoi(argv[1]),stoi(argv[2]));
-  control controller;
+  //  server a(stoi(argv[1]),stoi(argv[2]));
+  control controller(stoi(argv[1]),stoi(argv[2]));
   //  a.genPatient();
   //  cout << controller.genArrive(.1666) << endl;
   //  double average = 0;
@@ -31,7 +31,9 @@ int main(int argc, char* argv[]){
   cout << a.getStatus() << endl;
   */
   
-  cout << a.getArr() << endl;
+  //  cout << a.getArr() << endl;
+  controller.simulate();
+  //  cout << controller.sendReport() << endl;
   return 0;
 }
 
