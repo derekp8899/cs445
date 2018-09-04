@@ -1,0 +1,24 @@
+inter arrival time update
+  when gen next arrival time , use ... simclock +new arrive - (last arrival)
+  last arrival is the arrival time of the patient in the last queue postiion (queue.back().getArrival())
+  might result in one extra arrival time added to total inter arrival time when simulation is ended unless we add that to total
+   only after an arrival is processed?
+   must keep track of total number of arrivals?... that is != to the total number served... update this whenever a new arrive is proessed 
+
+update average # in queue
+  weighted average of queue size since last event...
+    update before processing any new events but need to use new event time not current sim clock.
+    
+    
+ must update new event timers after each event is processed in the server object.... if arrive = 2 and depart = 1
+    after the depart is processed the next arrival time needs to be updated to 2-1 =1.
+    must ensure simclock is being updated after each event! or second event will be logged as BEFORE first event.
+    
+ in process of new arrival 
+    if the server status is 0, not busy(pushing into queue size 0)...
+        must update the next depature event time it will be set to sentinal value and will always default to a new arrival otherwise
+        
+length of sim is stored in control
+number in queue after sim.. run triage.getQueueLen() after the loop until stop condition has ompleted.
+
+mean service time is --- updated when a departure is processed... total /numberserved upon conclusion of the simulation.
