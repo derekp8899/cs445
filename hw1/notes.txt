@@ -18,3 +18,7 @@ update average # in queue
     if the server status is 0, not busy(pushing into queue size 0)...
         must update the next depature event time it will be set to sentinal value and will always default to a new arrival otherwise
         
+length of sim is stored in control
+number in queue after sim.. run triage.getQueueLen() after the loop until stop condition has ompleted.
+
+mean service time is --- updated when a departure is processed... total /numberserved upon conclusion of the simulation.
