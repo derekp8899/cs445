@@ -68,8 +68,13 @@ int server::queueLen(){
 void server::setNextDep(){
 
   //  nextDep = queue[0].getServiceTime();
+  if (queue.size() > 0){
   nextDep = queue.front().getServiceTime();
-
+  }
+  else{
+    nextDep = 999999999;
+  }
+    
 }
 
 double server::newArrive(){

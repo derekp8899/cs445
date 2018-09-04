@@ -16,6 +16,9 @@ class control{
   int nextType;
   int arriveMean;//for hw 1 these is will be set by command line args from main
   int serviceMean;
+  int numInQue;
+  int totalArrivals;
+
   
  public:
   control(int,int);

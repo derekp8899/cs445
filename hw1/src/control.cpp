@@ -15,6 +15,8 @@ control::control(int arrMean, int servMean){
   avgQue = 0;
   avgWait = 0;
   MST = 0;
+  numInQue = 0;
+  totalArrivals = 0;
   intArrival = 0;
   aMean = arrMean;
   sMean = servMean;
@@ -57,10 +59,10 @@ void control::simulate(void){
     
 
 
-    update();
+    //update();
   }
   
-  
+  numInQue = triage.queueLen();
   // sendReport();
  
 }
@@ -113,8 +115,12 @@ void control::procArr(server* Server){
   simClock += nextArrive;//advamce the clock
   nextDepart -= nextArrive; //update depart event time
   nextArrive = (*Server).newArrive();
-  
-
+  if((*Server).getStatus()==0){
+    (*Server).setStatus(1);
+    (*Server).setNextDep();
+    nextDepart = (*Server).getDep();
+  }
+  totalArrivals++;
 }
 void control::procDepart(server* Server){
   //process a departure event
@@ -142,8 +148,16 @@ char * control::sendReport(void){
   //  strcpy(report,to_string(nextArrive));
   //sprintf(report,"%f",nextArrive);
   avgWait = (avgWait/numServed);
-  MST =(MST/numServed);
+  MST = (MST/numServed);
+  intArrival = (intArrival/totalArrivals);
+  
+  cout << "Mean Inter-Arrival time: " << intArrival << endl;
+  cout << "Mean Service time : " << MST << endl;
+  cout << "Length of Simulated time : " << simClock << endl;
   cout << "Average Wait Time : " << avgWait <<endl;
+  cout << "Average Number of Patients in the queue : " << avgQue << endl;
+  cout << "Number in queue after end of simulation : " << endl;
+
   return report;
 
 }
