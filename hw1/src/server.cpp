@@ -8,13 +8,10 @@ server::server(int arrMean, int servMean){
 
   numInQ = 0;
   lArr=(double)1/arrMean;
-  lServ = (double)1/servMean;
+  lServ = (double)1/servMean;//lamdas used in the exponential dist. functions
   status = 0;
-//  genPatient();
   nextArr = 0;
   nextDep = 999999999;//initialize so that arrive is first event;
-  //  vector <patient>queue;
-
 
 }
 
@@ -30,13 +27,13 @@ void server::setStatus(int n){
 
 }
 void server::genPatient(double simClock){
-
-  nextArr = control::genArrive(lArr);
+  //adds a patient to the queue with the next arrival time
+  //  nextArr = control::genArrive(lArr);
   patient Patient;
   Patient.setArrive(nextArr,simClock);
   Patient.setServiceTime(control::genService(lServ));
   queue.push_back(Patient);
-  patientArr(0);
+  patientArr(numInQ);
   numInQ++;
 }
 
@@ -47,7 +44,7 @@ double server::getArr(void){
 }
 
 double server::patientArr(int i){
-
+  //debugg function to ensure the proper arrival times are set
   cout << queue[i].getArrive() << endl;
 
 
@@ -69,5 +66,12 @@ void server::setNextDep(){
 
   nextDep = queue[0].getServiceTime();
 
+
+}
+
+double server::newArrive(){
+  double arriveTime = control::genArrive(lArr);
+  nextArr = arriveTime;
+  return nextArr;
 
 }

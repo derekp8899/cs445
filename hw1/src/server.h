@@ -22,6 +22,7 @@ class server{
   double patientArr(int);
   int getQueueSize();
   void setNextDep();
+  double newArrive();
 
 
 };
