@@ -32,9 +32,12 @@ void server::genPatient(double simClock){
   patient Patient;
   Patient.setArrive(nextArr,simClock);
   Patient.setServiceTime(control::genService(lServ));
-  queue.push_back(Patient);
-  patientArr(numInQ);
-  numInQ++;
+  //queue.push_back(Patient);
+  queue.push(Patient);
+  //  cout << " front of queue method " << queue.front().getArrive() << endl;
+  //patientArr(numInQ);
+  // numInQ++;
+  //QQ.pop();
 }
 
 double server::getArr(void){
@@ -45,7 +48,7 @@ double server::getArr(void){
 
 double server::patientArr(int i){
   //debugg function to ensure the proper arrival times are set
-  cout << queue[i].getArrive() << endl;
+  //cout << queue[i].getArrive() << endl;
 
 
 }
@@ -56,16 +59,16 @@ double server::getDep(){
 
 }
 
-int server::getQueueSize(){
+int server::queueLen(){
 
-  return numInQ;
+  return queue.size();
 
 }
 
 void server::setNextDep(){
 
-  nextDep = queue[0].getServiceTime();
-
+  //  nextDep = queue[0].getServiceTime();
+  nextDep = queue.front().getServiceTime();
 
 }
 
@@ -73,5 +76,25 @@ double server::newArrive(){
   double arriveTime = control::genArrive(lArr);
   nextArr = arriveTime;
   return nextArr;
+
+}
+
+double server::patientDep(double simClock){
+
+  queue.front().setDepart(simClock);
+  double waitTime = (queue.front().getDepart() - queue.front().getArrive() - queue.front().getServiceTime());
+  return waitTime;
+
+}
+
+void server::departure(){
+  queue.pop();
+
+
+
+}
+double server::getServiceTime(){
+
+  return queue.front().getServiceTime();
 
 }

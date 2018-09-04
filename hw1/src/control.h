@@ -25,7 +25,7 @@ class control{
   void update(void);
   void decide(void);
   void procArr(server *);
-  void procDepart(void);
+  void procDepart(server *);
   char * sendReport(void);
   int getQueueSize();
 

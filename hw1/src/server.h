@@ -1,4 +1,5 @@
 #include "patient.h"
+#include <queue>
 #include <vector>
 class server{
 
@@ -9,7 +10,8 @@ class server{
   double nextDep;
   double lArr;
   double lServ;//lamda for the exponential distributions
-  std::vector <patient>queue;
+  //std::vector <patient>queue;
+  std::queue <patient>queue;
   //void genPatient();
 
  public:
@@ -20,9 +22,10 @@ class server{
   double getDep(void);
   void genPatient(double);
   double patientArr(int);
-  int getQueueSize();
+  int queueLen();
   void setNextDep();
   double newArrive();
-
-
+  void departure();
+  double patientDep(double);
+  double getServiceTime();
 };
