@@ -20,7 +20,8 @@ class server{
   double getDep(void);
   void genPatient(double);
   double patientArr(int);
-
+  int getQueueSize();
+  void setNextDep();
 
 
 };

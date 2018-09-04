@@ -14,5 +14,6 @@ class patient{
   void setDepart(double);
   double getArrive(void);
   double getTotalTime(void);
-
+  double getDepart();
+  double getServiceTime();
 };

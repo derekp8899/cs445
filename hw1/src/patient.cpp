@@ -20,3 +20,29 @@ double patient::getArrive(){
   return arrive;
 
 }
+
+void patient::setServiceTime(double servtime){
+
+  serviceTime=servtime;
+
+
+}
+
+double patient::getServiceTime(){
+
+  return serviceTime;
+
+}
+
+void patient::setDepart( double simClock){
+
+  depart = serviceTime + simClock;
+
+
+}
+
+double patient::getDepart(){
+
+  return depart;
+
+}

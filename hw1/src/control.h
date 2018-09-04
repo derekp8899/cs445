@@ -27,5 +27,7 @@ class control{
   void procArr(server *);
   void procDepart(void);
   char * sendReport(void);
+  int getQueueSize();
+
 };
 
