@@ -30,7 +30,7 @@ void server::genPatient(double simClock){
   //adds a patient to the queue with the next arrival time
   //  nextArr = control::genArrive(lArr);
   patient Patient;
-  Patient.setArrive(nextArr,simClock);
+  Patient.setArrive(simClock);
   Patient.setServiceTime(control::genService(lServ));
   //queue.push_back(Patient);
   queue.push(Patient);

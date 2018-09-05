@@ -9,7 +9,7 @@ class patient{
 
  public:
   patient();
-  void setArrive(double,double);
+  void setArrive(double);
   void setServiceTime(double);
   void setDepart(double);
   double getArrive(void);

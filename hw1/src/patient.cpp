@@ -8,9 +8,9 @@ patient::patient(){
 
 
 }
-void patient::setArrive(double arrivetime, double simClock){
+void patient::setArrive(double simClock){
 
-  arrive = arrivetime + simClock;
+  arrive =  simClock;
 
 
 }

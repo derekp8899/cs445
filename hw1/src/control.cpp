@@ -9,7 +9,7 @@ using namespace std;
 
 control::control(int arrMean, int servMean){
 
-  stopCond = 3;
+  stopCond = 10;
   numServed = 0;
   simClock = 0;
   avgQue = 0;
@@ -44,6 +44,7 @@ void control::simulate(void){
   while ( numServed < stopCond){
     cout << "event times: Arrive: " << nextArrive << " departue: " << nextDepart << endl;
     cout << "queue size: " << triage.queueLen() << endl;
+    cout << "current sim time : " << simClock << endl;
     decide();
     if(nextType==0){
       //simClock += nextArrive;
@@ -63,7 +64,7 @@ void control::simulate(void){
   }
   
   numInQue = triage.queueLen();
-  // sendReport();
+  sendReport();
  
 }
 double control::genArrive(double mean){
@@ -111,9 +112,10 @@ void control::update(void){
 void control::procArr(server* Server){
   //process a new arrival event
 
-  (*Server).genPatient(simClock);//creates a mew patient and adds it to the queue with the generated arrival time
+  (*Server).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
   simClock += nextArrive;//advamce the clock
   nextDepart -= nextArrive; //update depart event time
+  intArrival += (*Server).getArr();
   nextArrive = (*Server).newArrive();
   if((*Server).getStatus()==0){
     (*Server).setStatus(1);
@@ -124,10 +126,10 @@ void control::procArr(server* Server){
 }
 void control::procDepart(server* Server){
   //process a departure event
-  avgWait = (*Server).patientDep(simClock);
+  simClock += nextDepart;
+  avgWait += (*Server).patientDep(simClock);
   MST += (*Server).getServiceTime();
   (*Server).departure();
-  simClock += nextDepart;
   nextArrive -= nextDepart;//update next arrive event time
   if((*Server).queueLen()>0){
 
@@ -156,7 +158,7 @@ char * control::sendReport(void){
   cout << "Length of Simulated time : " << simClock << endl;
   cout << "Average Wait Time : " << avgWait <<endl;
   cout << "Average Number of Patients in the queue : " << avgQue << endl;
-  cout << "Number in queue after end of simulation : " << endl;
+  cout << "Number in queue after end of simulation : " << numInQue << endl;
 
   return report;
 
