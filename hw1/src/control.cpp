@@ -9,7 +9,7 @@ using namespace std;
 
 control::control(int arrMean, int servMean){
 
-  stopCond = 10;
+  stopCond = 1000;
   numServed = 0;
   simClock = 0;
   avgQue = 0;
@@ -133,6 +133,7 @@ void control::procDepart(server* Server){
   nextArrive -= nextDepart;//update next arrive event time
   if((*Server).queueLen()>0){
 
+    (*Server).setNextDep();
     nextDepart = (*Server).getDep();
  
   }

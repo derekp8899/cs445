@@ -36,7 +36,7 @@ double patient::getServiceTime(){
 
 void patient::setDepart( double simClock){
 
-  depart = serviceTime + simClock;
+  depart = simClock;
 
 
 }
