@@ -11,6 +11,7 @@ class control{
   double MST;
   double avgWait;
   double avgQue;
+  double lastEvent;
   int stopCond;
   int numServed;
   int nextType;
@@ -18,6 +19,7 @@ class control{
   int serviceMean;
   int numInQue;
   int totalArrivals;
+  
 
   
  public:

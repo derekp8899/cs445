@@ -9,7 +9,8 @@ using namespace std;
 
 control::control(int arrMean, int servMean){
 
-  stopCond = 1000;
+  lastEvent = 0;
+  stopCond = 100;
   numServed = 0;
   simClock = 0;
   avgQue = 0;
@@ -115,6 +116,7 @@ void control::procArr(server* Server){
   (*Server).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
   simClock += nextArrive;//advamce the clock
   nextDepart -= nextArrive; //update depart event time
+  avgQue += ((*Server).queueLen()-1)*(simClock - lastEvent);
   intArrival += (*Server).getArr();
   nextArrive = (*Server).newArrive();
   if((*Server).getStatus()==0){
@@ -123,10 +125,12 @@ void control::procArr(server* Server){
     nextDepart = (*Server).getDep();
   }
   totalArrivals++;
+  lastEvent = simClock;
 }
 void control::procDepart(server* Server){
   //process a departure event
   simClock += nextDepart;
+  avgQue += ((*Server).queueLen()-1)*(simClock - lastEvent);
   avgWait += (*Server).patientDep(simClock);
   MST += (*Server).getServiceTime();
   (*Server).departure();
@@ -142,7 +146,7 @@ void control::procDepart(server* Server){
     (*Server).setStatus(0);
   }
 
-
+  lastEvent = simClock;
 }
 char * control::sendReport(void){
   //generate the appropriate reports
@@ -153,6 +157,7 @@ char * control::sendReport(void){
   avgWait = (avgWait/numServed);
   MST = (MST/numServed);
   intArrival = (intArrival/totalArrivals);
+  avgQue = avgQue/simClock;
   
   cout << "Mean Inter-Arrival time: " << intArrival << endl;
   cout << "Mean Service time : " << MST << endl;
