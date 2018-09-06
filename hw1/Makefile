@@ -1,3 +1,4 @@
+CXXFLAGS=-std=c++11
 
 sim:src/main.o src/server.o src/control.o src/patient.o
 	g++ src/main.o src/server.o src/control.o src/patient.o -o sim
