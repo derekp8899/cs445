@@ -10,9 +10,7 @@ class server{
   double nextDep;
   double lArr;
   double lServ;//lamda for the exponential distributions
-  //std::vector <patient>queue;
   std::queue <patient>queue;
-  //void genPatient();
 
  public:
   server(int,int);

@@ -1,11 +1,12 @@
 #include <vector>
 #include <iostream>
-//#include "server.h"
 #include "control.h"
-//#include "patient.h"
-using namespace std;
-server::server(int arrMean, int servMean){
 
+using namespace std;
+
+server::server(int arrMean, int servMean){//constructor for the server object
+
+  //init all the object variables
   numInQ = 0;
   lArr=(double)1/arrMean;
   lServ = (double)1/servMean;//lamdas used in the exponential dist. functions
@@ -16,32 +17,29 @@ server::server(int arrMean, int servMean){
 }
 
 int server::getStatus(void){
-
+  //return the status of the server (0 not busy, 1 is busy)
   return status;
 
 }
 
 void server::setStatus(int n){
-
+  //set the current status
   status = n;
 
 }
 void server::genPatient(double simClock){
   //adds a patient to the queue with the next arrival time
-  //  nextArr = control::genArrive(lArr);
+
   patient Patient;
-  Patient.setArrive(simClock);
-  Patient.setServiceTime(control::genService(lServ));
-  //queue.push_back(Patient);
-  queue.push(Patient);
-  //  cout << " front of queue method " << queue.front().getArrive() << endl;
-  //patientArr(numInQ);
-  // numInQ++;
-  //QQ.pop();
+  Patient.setArrive(simClock);//the patient arrives at current clock time
+  Patient.setServiceTime(control::genService(lServ));//generate a service time for the new patient
+  queue.push(Patient);//push a patient into the queue
+  //  cout << " front of queue method " << queue.front().getArrive() << endl; //for debugging, to ensure arrival time was set correctly
+
 }
 
 double server::getArr(void){
-
+  //return the next arrival time event
   return nextArr;
 
 }
@@ -54,30 +52,31 @@ double server::patientArr(int i){
 }
 
 double server::getDep(){
-
+  //return the next departure time event
   return nextDep;
 
 }
 
 int server::queueLen(){
-
+  //return how many patients are currently in the queue
   return queue.size();
 
 }
 
 void server::setNextDep(){
+  //set the next departure time 
 
-  //  nextDep = queue[0].getServiceTime();
   if (queue.size() > 0){
   nextDep = queue.front().getServiceTime();
   }
-  else{
+  else{//if the queue is currently empty must use sentinel to ensure next event is an arrival
     nextDep = 999999999;
   }
     
 }
 
 double server::newArrive(){
+  //generate a new arrival time
   double arriveTime = control::genArrive(lArr);
   nextArr = arriveTime;
   return nextArr;
@@ -85,7 +84,8 @@ double server::newArrive(){
 }
 
 double server::patientDep(double simClock){
-
+  //update the patients departure time and return that patients total wait time in the queue ( arrival until going into service)
+  
   queue.front().setDepart(simClock);
   double waitTime = (queue.front().getDepart() - queue.front().getArrive() - queue.front().getServiceTime());
   return waitTime;
@@ -93,13 +93,14 @@ double server::patientDep(double simClock){
 }
 
 void server::departure(){
+  //remove the patient after service is complete
+  
   queue.pop();
-
-
 
 }
 double server::getServiceTime(){
-
+  //return the service time of the patient currently in service
+  
   return queue.front().getServiceTime();
 
 }
