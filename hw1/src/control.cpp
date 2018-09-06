@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -159,6 +160,8 @@ char * control::sendReport(void){
   MST = (MST/numServed);
   intArrival = (intArrival/totalArrivals);
   avgQue = avgQue/simClock;//update the counters by dividing by the appropriate totals
+  cout << fixed;
+  cout << setprecision(2);
   
   cout << "Mean Inter-Arrival time: " << intArrival << endl;
   cout << "Mean Service time : " << MST << endl;
