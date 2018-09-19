@@ -62,3 +62,14 @@ void patient::setWait(double wait){
   totalWait += wait;
 
 }
+int patient::getType(){
+
+  return type;
+
+}
+
+void patient::setType(int n){
+
+  type = n;
+
+}

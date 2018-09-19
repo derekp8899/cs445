@@ -12,7 +12,7 @@ class control{
   double avgWait;
   double avgQue;
   double lastEvent;
-  double prob[4];//probability for each queue
+  double p[4];//probability for each queue
   int stopCond;
   int numServed;
   int nextType;
@@ -20,7 +20,7 @@ class control{
   int serviceMean;
   int numInQue;
   int totalArrivals;
-  
+  int departFrom;
 
   
  public:
@@ -35,7 +35,7 @@ class control{
   char * sendReport(void);
   int getQueueSize();
   double findDepart(server*);
-  void moveServer(server*);
-  
+  void moveServer(server*,int);
+  static int genType(double[]);  
 };
 

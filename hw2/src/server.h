@@ -8,6 +8,7 @@ class server{
   int numInQ;
   double nextArr;
   double nextDep;
+  int nextMove;
   double lArr;
   double lServ;//lamda for the exponential distributions
   //double l2nd;//landa for service time of 2nd queue if needed(redundant??)
@@ -40,5 +41,7 @@ class server{
   void updateWait(double);
   void moveIn(patient *);
   patient* moveOut();
+  void setNextMove();
+  int getNextMove();
 
 };

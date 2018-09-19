@@ -20,5 +20,7 @@ class patient{
   double getServiceTime();
   void setWait(double);
   double getWait();
+  int getType();
+  void setType(int);
   
 };

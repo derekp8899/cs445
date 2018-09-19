@@ -24,7 +24,7 @@ control::control(int arrMean, int servMean){
   nextArrive = 0;
   nextDepart = 9999999999999;//to assure first event is an arrival
   nextType = 0;//event type is 0 for arrive and 1 for depart
-
+  for (int i = 0;i<4;i++){p[i]=.25;}//testingpurpose withh be from file in final version
   
 }
 void control::simulate(void){
@@ -41,7 +41,7 @@ void control::simulate(void){
   nextArrive = triage.newArrive();//gen first arrival time
   procArr(servers[0]);//generate the first patient and generate the next arrive time
   triage.setStatus(1); //move first patient into service
-  int departFrom = 0;
+  departFrom = 0;//default to depart from triage first
   for(int i = 0; i<4;i++){
     (*servers[i]).setNextDep();
   }
@@ -184,22 +184,36 @@ char * control::sendReport(void){
   return report;
 
 }
-double control::findDepart(server *servers){
+double control::findDepart(server *servers){//check all servers for next departure time
 
   for(int i = 1; i < 4; i++){
 
     if(i == 0 ){
       nextDepart = servers[i].getDep();
+      departFrom = i;
     }
     else if(nextDepart > servers[i].getDep()){
 	nextDepart = servers[i].getDep();
+	departFrom = i;
     }
 
   }
 
 } 
-void control::moveServer(server *server){
+void control::moveServer(server *servers, int src){//move a patient from one server to another
+
+  int dest =  servers[src].getNextMove();
+  servers[src].updateWait(simClock);
+  servers[dest].moveIn(servers[src].moveOut());
+
+}
 
 
+int control::genType(double p[]){
+  //RNG for service times
+  random_device rd;
+  mt19937 gen(rd());
+  discrete_distribution<> d({p[0],p[1],p[2],p[3]});
+  return (d(gen));
 
 }

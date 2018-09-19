@@ -121,6 +121,17 @@ patient * server::moveOut(){
 }
 void server::moveIn(patient *patient){
 
+  (*patient).setServiceTime(control::genService(lServ));
   queue.push(*patient);
+
+}
+void server::setNextMove(){
+
+  nextMove = queue.front().getType();
+
+}
+int server::getNextMove(){
+
+  return nextMove;
 
 }
