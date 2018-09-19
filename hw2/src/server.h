@@ -11,7 +11,7 @@ class server{
   double lArr;
   double lServ;//lamda for the exponential distributions
   //double l2nd;//landa for service time of 2nd queue if needed(redundant??)
-  int serverType;//either triage or trauma/prompt/acute
+  //int serverType;//either triage or trauma/prompt/acute
   int numDischared;
   double avgDelay;
   double avgque;
@@ -20,7 +20,7 @@ class server{
     std::queue <patient>queue;
 
  public:
-    server(int,int,int,int);
+    server(int,int,int);
   int getStatus(void);
   void setStatus(int);
   double getArr(void);
@@ -37,5 +37,8 @@ class server{
   double getAvgDelay();
   double getAvgQue();
   double getServerUtl();
+  void updateWait(double);
+  void moveIn(patient *);
+  patient* moveOut();
 
 };

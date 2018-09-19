@@ -4,11 +4,10 @@
 
 using namespace std;
 
-server::server(int arrMean, int servMean, int type,int servers){//constructor for the server object
+server::server(int arrMean, int servMean, int servers){//constructor for the server object
 
   //init all the object variables
   numServers = servers;
-  serverType = type;
   numInQ = 0;
   lArr=(double)1/arrMean;
   lServ = (double)1/servMean;//lamdas used in the exponential dist. functions
@@ -16,6 +15,7 @@ server::server(int arrMean, int servMean, int type,int servers){//constructor fo
   nextArr = 0;
   nextDep = 999999999;//initialize so that arrive is first event;
 
+  
 }
 
 int server::getStatus(void){
@@ -104,5 +104,23 @@ double server::getServiceTime(){
   //return the service time of the patient currently in service
   
   return queue.front().getServiceTime();
+
+}
+void server::updateWait(double simClock){
+
+  double waitTime = (simClock - queue.front().getArrive() - queue.front().getServiceTime());
+  queue.front().setWait(waitTime);
+
+}
+patient * server::moveOut(){
+
+  patient *temp = &queue.front();
+  queue.pop();
+  return temp;
+
+}
+void server::moveIn(patient *patient){
+
+  queue.push(*patient);
 
 }

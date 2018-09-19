@@ -35,6 +35,7 @@ class control{
   char * sendReport(void);
   int getQueueSize();
   double findDepart(server*);
+  void moveServer(server*);
   
 };
 

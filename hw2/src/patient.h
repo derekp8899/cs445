@@ -7,6 +7,7 @@ class patient{
   double serviceTime;
   double depart;
   double totalWait;
+  int type;//for final server number
 
  public:
   patient();

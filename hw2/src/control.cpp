@@ -30,18 +30,22 @@ control::control(int arrMean, int servMean){
 void control::simulate(void){
   //function that controls the simulation
   server *servers[4];
-  server triage(aMean,sMean,0,1);//create serverObjects
-  server trauma(1,1,1,1);
-  server acute(1,1,1,1);
-  server prompt(1,1,1,1);
+  server triage(aMean,sMean,1);//create serverObjects
+  server trauma(1,1,1);
+  server acute(1,1,1);
+  server prompt(1,1,1);
   servers[0] = &triage;
   servers[1] = &trauma;
-  servers[2] = &acute;
+  servers[2] = &acute; 
   servers[3] = &prompt;
   nextArrive = triage.newArrive();//gen first arrival time
-  procArr(server[0]);//generate the first patient and generate the next arrive time
+  procArr(servers[0]);//generate the first patient and generate the next arrive time
   triage.setStatus(1); //move first patient into service
-  triage.setNextDep();
+  int departFrom = 0;
+  for(int i = 0; i<4;i++){
+    (*servers[i]).setNextDep();
+  }
+  
   nextDepart = triage.getDep();//update first departure
  
   while ( numServed < stopCond){//loop to continue simulation until the stopping condition is reached
@@ -60,7 +64,7 @@ void control::simulate(void){
     }
     else{
       
-      procDepart(&triage); // if departure is next event process the departure event
+      procDepart(servers[departFrom]); // if departure is next event process the departure event
 
       numServed++;
     }
@@ -184,8 +188,18 @@ double control::findDepart(server *servers){
 
   for(int i = 1; i < 4; i++){
 
-
+    if(i == 0 ){
+      nextDepart = servers[i].getDep();
+    }
+    else if(nextDepart > servers[i].getDep()){
+	nextDepart = servers[i].getDep();
+    }
 
   }
 
 } 
+void control::moveServer(server *server){
+
+
+
+}
