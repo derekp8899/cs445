@@ -31,11 +31,11 @@ class control{
   void update(void);
   void decide(void);
   void procArr(server *);
-  void procDepart(server *);
+  void procDepart(server **);
   char * sendReport(void);
   int getQueueSize();
-  double findDepart(server*);
-  void moveServer(server*,int);
+  double findDepart(server**);
+  void moveServer(server**,int);
   static int genType(double[]);  
 };
 

@@ -18,10 +18,11 @@ class server{
   double avgque;
   double serverUtl;
   int numServers;
-    std::queue <patient>queue;
+  double *p;
+  std::queue <patient>queue;
 
  public:
-    server(int,int,int);
+    server(int,int,int,double[]);
   int getStatus(void);
   void setStatus(int);
   double getArr(void);

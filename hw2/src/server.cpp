@@ -4,9 +4,10 @@
 
 using namespace std;
 
-server::server(int arrMean, int servMean, int servers){//constructor for the server object
+server::server(int arrMean, int servMean, int servers,double prob[]){//constructor for the server object
 
   //init all the object variables
+  p = prob;
   numServers = servers;
   numInQ = 0;
   lArr=(double)1/arrMean;
@@ -14,7 +15,7 @@ server::server(int arrMean, int servMean, int servers){//constructor for the ser
   status = 0;
   nextArr = 0;
   nextDep = 999999999;//initialize so that arrive is first event;
-
+  
   
 }
 
@@ -35,8 +36,10 @@ void server::genPatient(double simClock){
   patient Patient;
   Patient.setArrive(simClock);//the patient arrives at current clock time
   Patient.setServiceTime(control::genService(lServ));//generate a service time for the new patient
+  Patient.setType(control::genType(p));
+  cout << "type of patient is "<< Patient.getType() << endl;
   queue.push(Patient);//push a patient into the queue
-  //  cout << " front of queue method " << queue.front().getArrive() << endl; //for debugging, to ensure arrival time was set correctly
+  //cout << " front of queue type: " << queue.front().getType() << endl; //for debugging, to ensure arrival time was set correctly
 
 }
 
@@ -98,7 +101,7 @@ void server::departure(){
   //remove the patient after service is complete
   
   queue.pop();
-
+  setNextMove();
 }
 double server::getServiceTime(){
   //return the service time of the patient currently in service
@@ -116,6 +119,7 @@ patient * server::moveOut(){
 
   patient *temp = &queue.front();
   queue.pop();
+  setNextMove();
   return temp;
 
 }
