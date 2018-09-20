@@ -4,11 +4,11 @@
 class server{
 
  private:
-  int status;
+  int status;//number of working servers for 1 server if queue length is > 1  for n servers if queue length is > n (indexed at 0)
   int numInQ;
   double nextArr;
   double nextDep;
-  int nextMove;
+   int nextMove;
   double lArr;
   double lServ;//lamda for the exponential distributions
   //double l2nd;//landa for service time of 2nd queue if needed(redundant??)
@@ -19,7 +19,8 @@ class server{
   double serverUtl;
   int numServers;
   double *p;
-  std::queue <patient>queue;
+  double serverUtil[3];
+ std::queue <patient>queue;
 
  public:
     server(int,int,int,double[]);
@@ -44,5 +45,6 @@ class server{
   patient* moveOut();
   void setNextMove();
   int getNextMove();
+  void updateTotals(double, double);
 
 };

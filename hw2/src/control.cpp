@@ -129,10 +129,15 @@ void control::procArr(server* Server){
   //process a new arrival event
   //cout <<"procing an arrive" << endl;
   (*Server).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
+  (*Server).setNextMove();//must set queue if case the queue is empty and no move is set in triage
+
+  /*//the outputstats for hw1 different ones required for hw2
   simClock += nextArrive;//advamce the clock
   nextDepart -= nextArrive; //update depart event time
   avgQue += ((*Server).queueLen()-1)*(simClock - lastEvent);//update avgQue size counter
   intArrival += (*Server).getArr();//update inter-arrival counter
+  */
+
   nextArrive = (*Server).newArrive();//generate a new arrival time
   if((*Server).getStatus()==0){//if generating a new patient and queue is empty
     (*Server).setStatus(1);//set server to now busy
@@ -147,10 +152,14 @@ void control::procDepart(server** Servers){
   //process a departure event
   // cout << "procing a depart" << endl;
   simClock += nextDepart;//update sim clock
+
+  /*//output stats for hw1 need to be changed for hw2
   avgQue += ((*Servers[departFrom]).queueLen()-1)*(simClock - lastEvent);//update avg queue counter
   avgWait += (*Servers[departFrom]).patientDep(simClock);//update avg wait counter only needs to update after a new person can move into service
   MST += (*Servers[departFrom]).getServiceTime();//update mean service time
-  if((*Servers[departFrom]).getNextMove()==0||departFrom!=0){
+  */  
+
+if((*Servers[departFrom]).getNextMove()==0||departFrom!=0){
     (*Servers[departFrom]).departure();//pop a patient from front of the queue
     //  (*Servers[departFrom]).setNextDep();
   }
@@ -176,6 +185,7 @@ void control::procDepart(server** Servers){
     (*Server).setStatus(0);
   }
   *///commented for now to test new departure update
+
   lastEvent = simClock;//store the last event time
 }
 char * control::sendReport(void){

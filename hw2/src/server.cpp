@@ -15,8 +15,7 @@ server::server(int arrMean, int servMean, int servers,double prob[]){//construct
   status = 0;
   nextArr = 0;
   nextDep = 999999999;//initialize so that arrive is first event;
-  
-  
+    
 }
 
 int server::getStatus(void){
@@ -102,6 +101,8 @@ void server::departure(){
   
   queue.pop();
   setNextMove();
+  
+
 }
 double server::getServiceTime(){
   //return the service time of the patient currently in service
@@ -137,5 +138,15 @@ void server::setNextMove(){
 int server::getNextMove(){
 
   return nextMove;
+
+}
+void server::updateTotals(double simClock, double lastEvent){
+
+  for(int i = 0; i < status; i++){
+
+    serverUtil[i] += (simClock - lastEvent);
+
+  }
+
 
 }
