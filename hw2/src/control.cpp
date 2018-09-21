@@ -35,7 +35,7 @@ void control::simulate(void){
   server triage(aMean,sMean,1,p);//create serverObjects
   server trauma(0,1,1,p);
   server acute(0,1,1,p);
-  server prompt(0,1,1,p);
+  server prompt(0,1,3,p);
   servers[0] = &triage;
   servers[1] = &trauma;
   servers[2] = &acute; 

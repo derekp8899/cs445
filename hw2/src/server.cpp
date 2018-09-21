@@ -71,7 +71,15 @@ void server::setNextDep(){
   //set the next departure time 
 
   if (queue.size() > 0){
-    nextDep = queue.front().getServiceTime();
+    if(numServers > 1){
+      nextDep =departList[0];
+      for (int i = 1; i < departList.size(); i ++){
+	if(nextDep > departList[i])
+	  nextDep = departList[i];
+      }
+    }
+    else
+      nextDep = queue.front().getServiceTime();
   }
   else{//if the queue is currently empty must use sentinel to ensure next event is an arrival
     nextDep = 999999999;
@@ -165,4 +173,9 @@ void server::updateTotals(double simClock, double lastEvent){
 void server::updateDepartureTime(double d){
 
   nextDep -= d;
+  if (numServers > 1){
+    for(int i = 0; i<departList.size();i++)
+      departList[i]-= d;
+
+  }
 }
