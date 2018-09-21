@@ -24,7 +24,7 @@ class control{
 
   
  public:
-  control(int,int);
+  control();
   void simulate(void);
   static double genArrive(double);
   static double genService(double);

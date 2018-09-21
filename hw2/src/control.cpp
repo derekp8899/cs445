@@ -8,7 +8,7 @@
 
 using namespace std;
 
-control::control(int arrMean, int servMean){
+control::control(){
   //initialize all object variables
   lastEvent = 0;
   stopCond = 1000;
@@ -20,23 +20,35 @@ control::control(int arrMean, int servMean){
   numInQue = 0;
   totalArrivals = 0;
   intArrival = 0;
-  aMean = arrMean;
-  sMean = servMean;//the means for RNG from command line
+  //  aMean = arrMean;
+  //sMean = servMean;//the means for RNG from command line
   nextArrive = 0;
   nextDepart = 9999999999999;//to assure first event is an arrival
   nextType = 0;//event type is 0 for arrive and 1 for depart
-  for (int i = 0;i<4;i++){p[i]=.25;}//testingpurpose withh be from file in final version
+  //  for (int i = 0;i<4;i++){p[i]=.25;}//testingpurpose withh be from file in final version
   
 }
 void control::simulate(void){
   //function that controls the simulation
   //server *servers[4];
-  cout << "begin simulation" << endl;
+  ifstream input ("ed.txt");
+  double in[14];
+  for (int j = 0 ; j < 14; j++){
+    input>>in[j];
+  }
+  /*
+  for (int j = 0 ; j < 14; j++){
+    cout<< in[j] << ",";
+  }
+  */
+  stopCond = in[0];
+  p[0]=in[4];p[1]=in[7];p[2]=in[10];p[3]=in[13];
+  cout << endl <<"begin simulation" << endl;
   server **servers = (server**)malloc(sizeof(server*)*4);
-  server triage(aMean,sMean,1,p);//create serverObjects
-  server trauma(0,1,1,p);
-  server acute(0,1,1,p);
-  server prompt(0,1,3,p);
+  server triage(in[2],in[3],in[1],p);//create serverObjects
+  server trauma(0,in[6],in[5],p);
+  server acute(0,in[9],in[8],p);
+  server prompt(0,in[12],in[11],p);
   servers[0] = &triage;
   servers[1] = &trauma;
   servers[2] = &acute; 
@@ -107,7 +119,7 @@ double control::genService(double mean){
 void control::decide(void){
   //decide which event type is next
   //Arrival = 0 , Departure = 1
-  cout << "comapring evernt time " << nextArrive <<" " << nextDepart <<endl; 
+  //  cout << "comapring evernt time " << nextArrive <<" " << nextDepart <<endl; 
   if (nextArrive < nextDepart){
     nextType = 0;
   }
@@ -132,7 +144,7 @@ void control::update(void){
 }
 void control::procArr(server *Server){
   //process a new arrival event
-  cout <<"procing an arrive" << endl;
+  //cout <<"procing an arrive" << endl;
   (*Server).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
   (*Server).setNextMove();//must set queue if case the queue is empty and no move is set in triage
 
@@ -156,7 +168,7 @@ void control::procArr(server *Server){
 }
 void control::procDepart(server** Servers){
   //process a departure event
-  cout << "procing a depart at " << departFrom << endl;
+  //cout << "procing a depart at " << departFrom << endl;
   simClock += nextDepart;//update sim clock
 
   /*//output stats for hw1 need to be changed for hw2
@@ -249,7 +261,7 @@ double control::findDepart(server **servers){//check all servers for next depart
 void control::moveServer(server **servers, int src){//move a patient from one server to another
 
   int dest =  (*servers[src]).getNextMove();
-  cout << "procing a move at "<< src << " to "<< dest  << endl;
+  //cout << "procing a move at "<< src << " to "<< dest  << endl;
   (*servers[src]).updateWait(simClock);
   (*servers[dest]).moveIn((*servers[src]).moveOut());
 
