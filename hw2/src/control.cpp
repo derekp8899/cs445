@@ -1,4 +1,5 @@
 #include "control.h"
+#include <fstream>
 #include <random>
 #include <cstring>
 #include <string>
