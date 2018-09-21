@@ -30,6 +30,7 @@ control::control(int arrMean, int servMean){
 void control::simulate(void){
   //function that controls the simulation
   //server *servers[4];
+  cout << "begin simulation" << endl;
   server **servers = (server**)malloc(sizeof(server*)*4);
   server triage(aMean,sMean,1,p);//create serverObjects
   server trauma(0,1,1,p);
@@ -62,7 +63,9 @@ void control::simulate(void){
     if(nextType==0){
       
       procArr(servers[0]); //if arrive is next event process the arriveal event
-      findDepart(servers);
+      if(nextDepart > 999999)
+	findDepart(servers);
+
     }
     else{
       
@@ -103,6 +106,7 @@ double control::genService(double mean){
 void control::decide(void){
   //decide which event type is next
   //Arrival = 0 , Departure = 1
+  cout << "comapring evernt time " << nextArrive <<" " << nextDepart <<endl; 
   if (nextArrive < nextDepart){
     nextType = 0;
   }
@@ -125,9 +129,9 @@ void control::update(void){
   //function no longer needed moved updates to process for each event
 
 }
-void control::procArr(server* Server){
+void control::procArr(server *Server){
   //process a new arrival event
-  //cout <<"procing an arrive" << endl;
+  cout <<"procing an arrive" << endl;
   (*Server).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
   (*Server).setNextMove();//must set queue if case the queue is empty and no move is set in triage
 
@@ -137,7 +141,8 @@ void control::procArr(server* Server){
   avgQue += ((*Server).queueLen()-1)*(simClock - lastEvent);//update avgQue size counter
   intArrival += (*Server).getArr();//update inter-arrival counter
   */
-
+  
+  nextDepart -= nextArrive;
   nextArrive = (*Server).newArrive();//generate a new arrival time
   if((*Server).getStatus()==0){//if generating a new patient and queue is empty
     (*Server).setStatus(1);//set server to now busy
@@ -150,7 +155,7 @@ void control::procArr(server* Server){
 }
 void control::procDepart(server** Servers){
   //process a departure event
-  // cout << "procing a depart" << endl;
+  cout << "procing a depart at " << departFrom << endl;
   simClock += nextDepart;//update sim clock
 
   /*//output stats for hw1 need to be changed for hw2
@@ -171,6 +176,16 @@ if((*Servers[departFrom]).getNextMove()==0||departFrom!=0){
 
   nextArrive -= nextDepart;//update next arrive event time
   (*Servers[departFrom]).setNextDep();
+  for( int i =0; i < 4; i ++){
+
+    if ( i != departFrom){
+
+      (*Servers[i]).updateDepartureTime(nextDepart);
+      
+    }
+
+  }
+
   findDepart(Servers);
 
   /*

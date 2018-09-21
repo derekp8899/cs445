@@ -15,7 +15,7 @@ server::server(int arrMean, int servMean, int servers,double prob[]){//construct
   status = 0;
   nextArr = 0;
   nextDep = 999999999;//initialize so that arrive is first event;
-    
+  //double departures[numServers];  
 }
 
 int server::getStatus(void){
@@ -36,7 +36,7 @@ void server::genPatient(double simClock){
   Patient.setArrive(simClock);//the patient arrives at current clock time
   Patient.setServiceTime(control::genService(lServ));//generate a service time for the new patient
   Patient.setType(control::genType(p));
-  cout << "type of patient is "<< Patient.getType() << endl;
+  //  cout << "type of patient is "<< Patient.getType() << endl;
   queue.push(Patient);//push a patient into the queue
   //cout << " front of queue type: " << queue.front().getType() << endl; //for debugging, to ensure arrival time was set correctly
 
@@ -71,7 +71,7 @@ void server::setNextDep(){
   //set the next departure time 
 
   if (queue.size() > 0){
-  nextDep = queue.front().getServiceTime();
+    nextDep = queue.front().getServiceTime();
   }
   else{//if the queue is currently empty must use sentinel to ensure next event is an arrival
     nextDep = 999999999;
@@ -100,6 +100,11 @@ void server::departure(){
   //remove the patient after service is complete
   
   queue.pop();
+  if(departList.size()> 0){
+
+    departList.pop_back();
+    
+  }
   setNextMove();
   
 
@@ -127,6 +132,13 @@ patient * server::moveOut(){
 void server::moveIn(patient *patient){
 
   (*patient).setServiceTime(control::genService(lServ));
+  if (queue.size() < 1){
+    
+    nextDep=(*patient).getServiceTime();
+    
+  }
+  
+  departList.push_back((*patient).getServiceTime());
   queue.push(*patient);
 
 }
@@ -149,4 +161,8 @@ void server::updateTotals(double simClock, double lastEvent){
   }
 
 
+}
+void server::updateDepartureTime(double d){
+
+  nextDep -= d;
 }
