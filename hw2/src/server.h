@@ -48,5 +48,5 @@ class server{
   int getNextMove();
   void updateTotals(double, double);
   void updateDepartureTime(double);
- 
+  void report();
 };

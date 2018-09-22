@@ -48,11 +48,11 @@ void control::simulate(void){
   server triage(in[2],in[3],in[1],p);//create serverObjects
   server trauma(0,in[6],in[5],p);
   server acute(0,in[9],in[8],p);
-  server prompt(0,in[12],in[11],p);
+  server prompt(0,in[12],in[11],p);//create all the servers
   servers[0] = &triage;
   servers[1] = &trauma;
   servers[2] = &acute; 
-  servers[3] = &prompt;
+  servers[3] = &prompt;//populate the array of servers
   nextArrive = triage.newArrive();//gen first arrival time
   procArr(servers);//generate the first patient and generate the next arrive time
   triage.setStatus(1); //move first patient into service
@@ -64,7 +64,7 @@ void control::simulate(void){
   
   nextDepart = triage.getDep();//update first departure
  
-  while ( stopCond > simClock){//loop to continue simulation until the stopping condition is reached
+  while ( (stopCond > simClock + nextArrive) && (stopCond > simClock + nextDepart)){//loop to continue simulation until the stopping condition is reached
 
     /*    //this was used for debugging that events, queue , amd sim time were correctly updating
     cout << "event times: Arrive: " << nextArrive << " departue: " << nextDepart << endl;
@@ -93,6 +93,11 @@ void control::simulate(void){
   }
   
   numInQue = triage.queueLen();//store the number still left in queue at the end of simulation
+
+  for(int j = 0; j < 4; j++){
+    (*servers[j]).report();
+  }
+
   sendReport();//generate the end reports after loop has terminated
  
 }
@@ -157,9 +162,8 @@ void control::procArr(server **Server){
 
   nextDepart -= nextArrive;
   for( int i =1; i < 4; i ++){
-    if ( i != departFrom){
+   
       (*Server[i]).updateDepartureTime(nextDepart); 
-    }
   }
   
   nextArrive = (*Server[0]).newArrive();//generate a new arrival time
@@ -174,7 +178,7 @@ void control::procArr(server **Server){
 }
 void control::procDepart(server** Servers){
   //process a departure event
-  //cout << "procing a depart at " << departFrom << endl;
+  cout << "procing a depart at " << departFrom << endl;
   simClock += nextDepart;//update sim clock
 
   /*//output stats for hw1 need to be changed for hw2

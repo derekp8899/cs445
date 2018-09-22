@@ -183,3 +183,10 @@ void server::updateDepartureTime(double d){
 
   }
 }
+void server::report(){
+
+  cout << " printing size of queue and depart list " << endl;
+  cout << queue.size() << ", "<< departList.size() << endl;
+  cout << endl;
+
+}
