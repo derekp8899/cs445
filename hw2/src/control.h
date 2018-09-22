@@ -30,7 +30,7 @@ class control{
   static double genService(double);
   void update(void);
   void decide(void);
-  void procArr(server *);
+  void procArr(server **);
   void procDepart(server **);
   char * sendReport(void);
   int getQueueSize();

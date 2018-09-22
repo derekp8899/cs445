@@ -113,6 +113,8 @@ void server::departure(){
     departList.pop_back();
     
   }
+  if(queue.size() < numServers)
+    status++;
   setNextMove();
   
 
@@ -143,9 +145,11 @@ void server::moveIn(patient *patient){
   if (queue.size() < 1){
     
     nextDep=(*patient).getServiceTime();
-    
-  }
   
+  }
+  if(status < numServers){
+    status++;
+  }
   departList.push_back((*patient).getServiceTime());
   queue.push(*patient);
 

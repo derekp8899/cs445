@@ -54,7 +54,7 @@ void control::simulate(void){
   servers[2] = &acute; 
   servers[3] = &prompt;
   nextArrive = triage.newArrive();//gen first arrival time
-  procArr(servers[0]);//generate the first patient and generate the next arrive time
+  procArr(servers);//generate the first patient and generate the next arrive time
   triage.setStatus(1); //move first patient into service
   departFrom = 0;//default to depart from triage first
   for(int i = 0; i<4;i++){
@@ -75,7 +75,7 @@ void control::simulate(void){
     decide();
     if(nextType==0){
       
-      procArr(servers[0]); //if arrive is next event process the arriveal event
+      procArr(servers); //if arrive is next event process the arriveal event
       if(nextDepart > 999999)
 	findDepart(servers);
 
@@ -142,11 +142,11 @@ void control::update(void){
   //function no longer needed moved updates to process for each event
 
 }
-void control::procArr(server *Server){
+void control::procArr(server **Server){
   //process a new arrival event
   //cout <<"procing an arrive" << endl;
-  (*Server).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
-  (*Server).setNextMove();//must set queue if case the queue is empty and no move is set in triage
+  (*Server[0]).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
+  (*Server[0]).setNextMove();//must set queue if case the queue is empty and no move is set in triage
 
   /*//the outputstats for hw1 different ones required for hw2
   simClock += nextArrive;//advamce the clock
@@ -154,12 +154,18 @@ void control::procArr(server *Server){
   avgQue += ((*Server).queueLen()-1)*(simClock - lastEvent);//update avgQue size counter
   intArrival += (*Server).getArr();//update inter-arrival counter
   */
-  
+
   nextDepart -= nextArrive;
-  nextArrive = (*Server).newArrive();//generate a new arrival time
-  if((*Server).getStatus()==0){//if generating a new patient and queue is empty
-    (*Server).setStatus(1);//set server to now busy
-    (*Server).setNextDep();
+  for( int i =1; i < 4; i ++){
+    if ( i != departFrom){
+      (*Server[i]).updateDepartureTime(nextDepart); 
+    }
+  }
+  
+  nextArrive = (*Server[0]).newArrive();//generate a new arrival time
+  if((*Server[0]).getStatus()==0){//if generating a new patient and queue is empty
+    (*Server[0]).setStatus(1);//set server to now busy
+    (*Server[0]).setNextDep();
     //nextDepart = (*Server).getDep();//update next departure time from sentinel value
   }
   
