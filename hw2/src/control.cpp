@@ -67,9 +67,9 @@ void control::simulate(void){
   while (simClock < stopCond ){//loop to continue simulation until the stopping condition is reached
 
     //this was used for debugging that events, queue , amd sim time were correctly updating
-    cout << "event times: Arrive: " << nextArrive << " departue: " << nextDepart << endl;
+    //    cout << "event times: Arrive: " << nextArrive << " departue: " << nextDepart << endl;
     //cout << "queue size: " << triage.queueLen() << endl;
-    cout << "current sim time : " << simClock << endl;
+    //    cout << "current sim time : " << simClock << endl;
     
 
     decide();
@@ -150,7 +150,7 @@ void control::update(void){
 }
 void control::procArr(server **Server){
   //process a new arrival event
-  cout <<"procing an arrive" << endl;
+  //  cout <<"procing an arrive" << endl;
   (*Server[0]).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
   // (*Server[0]).setNextMove();//must set queue if case the queue is empty and no move is set in triage
 
@@ -164,7 +164,7 @@ void control::procArr(server **Server){
   nextDepart -= nextArrive;
   for( int i =1; i < 4; i ++){
    
-      (*Server[i]).updateDepartureTime(nextArrive); 
+    (*Server[i]).updateDepartureTime(nextArrive,0); 
   }
   
   nextArrive = (*Server[0]).newArrive();//generate a new arrival time
@@ -179,7 +179,7 @@ void control::procArr(server **Server){
 }
 void control::procDepart(server** Servers){
   //process a departure event
-  cout << "procing a depart at " << departFrom << endl;
+  //  cout << "procing a depart at " << departFrom << endl;
   simClock += nextDepart;//update sim clock
 
   /*//output stats for hw1 need to be changed for hw2
@@ -187,22 +187,23 @@ void control::procDepart(server** Servers){
   avgWait += (*Servers[departFrom]).patientDep(simClock);//update avg wait counter only needs to update after a new person can move into service
   MST += (*Servers[departFrom]).getServiceTime();//update mean service time
   */  
-
+  int lastMove = 0;
   if((*Servers[departFrom]).getNextMove()==0||departFrom!=0){
-    //  cout << "updating for " << departFrom << endl;
+    cout << "updating for " << departFrom << endl;
     (*Servers[departFrom]).updateWait(simClock);
     // cout << "update complete" <<endl;
     (*Servers[departFrom]).departure();//pop a patient from front of the queue
     (*Servers[departFrom]).setNextDep();
   }
   else{
-
-    //cout << "updating for " << departFrom << endl;
-   (*Servers[departFrom]).updateWait(simClock);
-   //cout << "wait update complete" << endl;
-   (*Servers[departFrom]).patientDep(simClock);
-   moveServer(Servers,departFrom);
-   (*Servers[departFrom]).setNextDep();
+    
+    cout << "updating for " << departFrom << endl;
+    (*Servers[departFrom]).updateWait(simClock);
+    //cout << "wait update complete" << endl;
+    (*Servers[departFrom]).patientDep(simClock);
+    lastMove = (*Servers[departFrom]).getNextMove();
+    moveServer(Servers,departFrom);
+    (*Servers[departFrom]).setNextDep();
    
   }
 
@@ -210,12 +211,13 @@ void control::procDepart(server** Servers){
   (*Servers[departFrom]).setNextDep();
   for( int i =0; i < 4; i ++){
 
-    //    if ( i != departFrom){
+    if (i == 3 && (departFrom == 3 || lastMove ==3)){
 
-      (*Servers[i]).updateDepartureTime(nextDepart);
+      (*Servers[i]).updateDepartureTime(nextDepart,1);
       
-      // }
-
+    }
+    else
+      (*Servers[i]).updateDepartureTime(nextDepart,0);
   }
 
   findDepart(Servers);
@@ -259,7 +261,7 @@ char * control::sendReport(void){
 
 }
 double control::findDepart(server **servers){//check all servers for next departure time
-  cout << "finding a new depart " << endl;;
+  //  cout << "finding a new depart " << endl;;
   for(int i = 0; i < 4; i++){
     if ((*servers[i]).getDep() <= 0){
       (*servers[i]).setNextDep();
@@ -269,7 +271,7 @@ double control::findDepart(server **servers){//check all servers for next depart
       departFrom = i;
     }
     else{
-      cout <<"comparing " << nextDepart << " with " << (*servers[i]).getDep() << endl;
+      //      cout <<"comparing " << nextDepart << " with " << (*servers[i]).getDep() << endl;
       if(nextDepart > (*servers[i]).getDep()){
 
 	nextDepart = (*servers[i]).getDep();
@@ -277,14 +279,14 @@ double control::findDepart(server **servers){//check all servers for next depart
       }
     }
   }
-  cout << "found at: " << departFrom <<" it is " << nextDepart << endl;
+  //  cout << "found at: " << departFrom <<" it is " << nextDepart << endl;
   
 
 } 
 void control::moveServer(server **servers, int src){//move a patient from one server to another
 
   int dest =  (*servers[src]).getNextMove();
-  cout << "procing a move at "<< src << " to "<< dest  << endl;
+  //  cout << "procing a move at "<< src << " to "<< dest  << endl;
 
   (*servers[dest]).moveIn((*servers[src]).moveOut());
 
