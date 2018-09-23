@@ -150,7 +150,7 @@ void control::update(void){
 }
 void control::procArr(server **Server){
   //process a new arrival event
-  //cout <<"procing an arrive" << endl;
+  cout <<"procing an arrive" << endl;
   (*Server[0]).genPatient(simClock+nextArrive);//creates a mew patient and adds it to the queue with the generated arrival time
   // (*Server[0]).setNextMove();//must set queue if case the queue is empty and no move is set in triage
 
@@ -179,7 +179,7 @@ void control::procArr(server **Server){
 }
 void control::procDepart(server** Servers){
   //process a departure event
-  //cout << "procing a depart at " << departFrom << endl;
+  cout << "procing a depart at " << departFrom << endl;
   simClock += nextDepart;//update sim clock
 
   /*//output stats for hw1 need to be changed for hw2
@@ -210,11 +210,11 @@ void control::procDepart(server** Servers){
   (*Servers[departFrom]).setNextDep();
   for( int i =0; i < 4; i ++){
 
-    if ( i != departFrom){
+    //    if ( i != departFrom){
 
       (*Servers[i]).updateDepartureTime(nextDepart);
       
-    }
+      // }
 
   }
 
@@ -259,28 +259,32 @@ char * control::sendReport(void){
 
 }
 double control::findDepart(server **servers){//check all servers for next departure time
-  //cout << "finding a new depart " << endl;;
+  cout << "finding a new depart " << endl;;
   for(int i = 0; i < 4; i++){
-    //(*servers[i]).setNextDep();
+    if ((*servers[i]).getDep() <= 0){
+      (*servers[i]).setNextDep();
+    }
     if(i == 0 ){
       nextDepart = (*servers[i]).getDep();
       departFrom = i;
     }
-    else if(nextDepart > (*servers[i]).getDep()){
-      //  cout <<"comparing " << nextDepart << " with " << (*servers[i]).getDep() << endl;
-      nextDepart = (*servers[i]).getDep();
-      departFrom = i;
+    else{
+      cout <<"comparing " << nextDepart << " with " << (*servers[i]).getDep() << endl;
+      if(nextDepart > (*servers[i]).getDep()){
+
+	nextDepart = (*servers[i]).getDep();
+	departFrom = i;
+      }
     }
-    
   }
-  //cout << "found at: " << departFrom <<" it is " << nextDepart << endl;
+  cout << "found at: " << departFrom <<" it is " << nextDepart << endl;
   
 
 } 
 void control::moveServer(server **servers, int src){//move a patient from one server to another
 
   int dest =  (*servers[src]).getNextMove();
-  //cout << "procing a move at "<< src << " to "<< dest  << endl;
+  cout << "procing a move at "<< src << " to "<< dest  << endl;
 
   (*servers[dest]).moveIn((*servers[src]).moveOut());
 

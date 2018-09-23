@@ -78,12 +78,13 @@ void server::setNextDep(){
   //set the next departure time 
 
   if (queue.size() > 0){
-    cout << "looking for new depart time" << endl;
+    //    cout << "looking for new depart time" << endl;
     if(numServers > 1 && departList.size() > 0){
       nextDep =departList[0];
+      cout << "searching 3 " << departList[0] <<endl;
       int i = 1;
       while (i < departList.size() && i < status){
-	//	cout << "searching at: " << i <<endl;
+       	cout << "searching 3 " << departList[i] <<endl;
 	if(nextDep > departList[i])
 	  nextDep = departList[i];
 	i++;
@@ -119,9 +120,14 @@ void server::departure(){
   //remove the patient after service is complete
   queue.pop();
   avgDelay += queue.front().getWait();
+  int flag = 0;
+  for ( int i = 0; i < departList.size();i++){
+    if (departList[i] == nextDep)
+      flag = i;
+  }
   if(departList.size()> 0){
 
-    departList.erase(departList.begin());
+    departList.erase(departList.begin()+flag);
     
   }
   if(queue.size() < numServers)
@@ -178,9 +184,9 @@ void server::moveIn(patient *patient){
   }
   departList.push_back((*patient).getServiceTime());
   queue.push(*patient);
-  if(queue.size()==1){
+  if(numServers > 1)
     setNextDep();
-  }
+  
 }
 void server::setNextMove(){
 
@@ -204,12 +210,13 @@ void server::updateTotals(double simClock, double lastEvent){
 
 }
 void server::updateDepartureTime(double d){
-
+  cout << "update depart " << nextDep << " - " << d << endl;
   nextDep -= d;
   if (numServers > 1){
-    for(int i = 0; i<status;i++)
+    for(int i = 0; i<status;i++){
+      cout << "in server 3 updating " << departList[i] << " - " << d << endl;
       departList[i]-= d;
-
+    }
   }
 }
 void server::report(double simClock){
