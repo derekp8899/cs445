@@ -35,7 +35,7 @@ class server{
   void setNextDep();
   double newArrive();
   void departure();
-  double patientDep(double);
+  void patientDep(double);
   double getServiceTime();
   int getNumDischarged();
   double getAvgDelay();
@@ -48,5 +48,5 @@ class server{
   int getNextMove();
   void updateTotals(double, double);
   void updateDepartureTime(double);
-  void report();
+  void report(double);
 };
