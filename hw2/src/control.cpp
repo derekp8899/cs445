@@ -161,6 +161,9 @@ void control::procArr(server **Server){
   intArrival += (*Server).getArr();//update inter-arrival counter
   */
   simClock += nextArrive;
+  for(int i = 0; i < 4; i++){
+    (*Server[i]).updateTotals(simClock,lastEvent);
+  }
   nextDepart -= nextArrive;
   for( int i =1; i < 4; i ++){
    
@@ -181,7 +184,9 @@ void control::procDepart(server** Servers){
   //process a departure event
   //  cout << "procing a depart at " << departFrom << endl;
   simClock += nextDepart;//update sim clock
-
+  for(int i = 0; i < 4; i++){
+    (*Servers[i]).updateTotals(simClock,lastEvent);
+  }
   /*//output stats for hw1 need to be changed for hw2
   avgQue += ((*Servers[departFrom]).queueLen()-1)*(simClock - lastEvent);//update avg queue counter
   avgWait += (*Servers[departFrom]).patientDep(simClock);//update avg wait counter only needs to update after a new person can move into service
@@ -189,7 +194,7 @@ void control::procDepart(server** Servers){
   */  
   int lastMove = 0;
   if((*Servers[departFrom]).getNextMove()==0||departFrom!=0){
-    cout << "updating for " << departFrom << endl;
+    //    cout << "updating for " << departFrom << endl;
     (*Servers[departFrom]).updateWait(simClock);
     // cout << "update complete" <<endl;
     (*Servers[departFrom]).departure();//pop a patient from front of the queue
@@ -197,7 +202,7 @@ void control::procDepart(server** Servers){
   }
   else{
     
-    cout << "updating for " << departFrom << endl;
+    //    cout << "updating for " << departFrom << endl;
     (*Servers[departFrom]).updateWait(simClock);
     //cout << "wait update complete" << endl;
     (*Servers[departFrom]).patientDep(simClock);
