@@ -12,8 +12,6 @@ compile with make
 
 run with
 
-./sim 1 2
+./sim
 
-where 1 is the mean you wish to use for arrival time generation
-
-and 2 is the mean you wish to use for service time generation
+will read input values from file 'ed.txt'

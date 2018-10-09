@@ -14,8 +14,12 @@ server::server(int arrMean, int servMean, int servers,double prob[]){//construct
   lServ = (double)1/servMean;//lamdas used in the exponential dist. functions
   status = 0;
   nextArr = 0;
+  numDischared = 0;
+  avgDelay = 0;
+  avgque = 0;
   nextDep = 999999999;//initialize so that arrive is first event;
-    
+  for (int i = 0; i < 3;i++)
+    serverUtil[i] = 0;
 }
 
 int server::getStatus(void){
@@ -36,10 +40,13 @@ void server::genPatient(double simClock){
   Patient.setArrive(simClock);//the patient arrives at current clock time
   Patient.setServiceTime(control::genService(lServ));//generate a service time for the new patient
   Patient.setType(control::genType(p));
-  cout << "type of patient is "<< Patient.getType() << endl;
   queue.push(Patient);//push a patient into the queue
-  //cout << " front of queue type: " << queue.front().getType() << endl; //for debugging, to ensure arrival time was set correctly
-
+  if(status < numServers)
+    status++;
+  if (queue.size() == 1){
+    setNextMove();
+    setNextDep();
+  }
 }
 
 double server::getArr(void){
@@ -71,7 +78,17 @@ void server::setNextDep(){
   //set the next departure time 
 
   if (queue.size() > 0){
-  nextDep = queue.front().getServiceTime();
+    if(numServers > 1 && departList.size() > 0){
+      nextDep =departList[0];
+      int i = 1;
+      while (i < departList.size() && i < status){
+	if(nextDep > departList[i])
+	  nextDep = departList[i];
+	i++;
+      }
+    }
+    else
+      nextDep = queue.front().getServiceTime();
   }
   else{//if the queue is currently empty must use sentinel to ensure next event is an arrival
     nextDep = 999999999;
@@ -87,19 +104,30 @@ double server::newArrive(){
 
 }
 
-double server::patientDep(double simClock){
+void server::patientDep(double simClock){
   //update the patients departure time and return that patients total wait time in the queue ( arrival until going into service)
   
   queue.front().setDepart(simClock);
-  double waitTime = (queue.front().getDepart() - queue.front().getArrive() - queue.front().getServiceTime());
-  return waitTime;
 
 }
 
 void server::departure(){
   //remove the patient after service is complete
-  
+  avgDelay += queue.front().getWait();
   queue.pop();
+  int flag = 0;
+  for ( int i = 0; i < departList.size();i++){
+    if (departList[i] == nextDep)
+      flag = i;
+  }
+  if(departList.size()> 0){
+
+    departList.erase(departList.begin()+flag);
+    
+  }
+  if(queue.size() < numServers)
+    status--;
+  numDischared++;
   setNextMove();
   
 
@@ -111,15 +139,30 @@ double server::getServiceTime(){
 
 }
 void server::updateWait(double simClock){
-
-  double waitTime = (simClock - queue.front().getArrive() - queue.front().getServiceTime());
-  queue.front().setWait(waitTime);
+  double waitTime = 0;
+  if(queue.front().getDepart() != 0){
+    
+    waitTime = (simClock - queue.front().getDepart() - queue.front().getServiceTime()); 
+    if (waitTime < 0)
+      waitTime = 0;//mitigate floating point precision errors 
+    queue.front().setWait(waitTime);
+  }
+  else{
+    waitTime = (simClock - queue.front().getArrive() - queue.front().getServiceTime());
+    if (waitTime < 0)
+      waitTime = 0;//mitigate floating point precision errors 
+    queue.front().setWait(waitTime);
+  }
 
 }
 patient * server::moveOut(){
 
   patient *temp = &queue.front();
+  avgDelay += queue.front().getWait();
   queue.pop();
+  
+  if (queue.size() < numServers)
+    status--;
   setNextMove();
   return temp;
 
@@ -127,8 +170,19 @@ patient * server::moveOut(){
 void server::moveIn(patient *patient){
 
   (*patient).setServiceTime(control::genService(lServ));
+  if (queue.size() < 1){
+    
+    nextDep=(*patient).getServiceTime();
+  
+  }
+  if(status < numServers){
+    status++;
+  }
+  departList.push_back((*patient).getServiceTime());
   queue.push(*patient);
-
+  if(numServers > 1)
+    setNextDep();
+  
 }
 void server::setNextMove(){
 
@@ -141,12 +195,46 @@ int server::getNextMove(){
 
 }
 void server::updateTotals(double simClock, double lastEvent){
-
+  if (queue.size() > numServers){
+    avgque += (queue.size()-numServers)*(simClock - lastEvent);
+  }
   for(int i = 0; i < status; i++){
 
     serverUtil[i] += (simClock - lastEvent);
-
   }
 
 
+}
+void server::updateDepartureTime(double d,int flag){
+  nextDep -= d;
+  if (numServers > 1){
+    if (flag ==1){
+
+      for(int i = 0; i<(status-1);i++){
+	departList[i]-= d;
+      }
+    }
+    else{
+      for(int i = 0; i<status;i++){
+	departList[i]-= d;
+      }
+    }
+  }
+}
+void server::report(double simClock){
+
+  avgDelay = avgDelay/numDischared;
+  avgque = avgque/simClock;
+  for (int i = 0; i < numServers; i++){
+    serverUtil[i] = serverUtil[i]/simClock;
+  }
+  cout << endl;
+  cout << "Number of patients discharged: " << numDischared << endl;
+  cout << "Average delay for this queue: " << avgDelay << endl;
+  cout << "Average queue size: " << avgque << endl;
+  cout << "Server utilization(s)" << endl;
+  for(int i = 0; i < numServers;i++){
+    cout << "Server " << i << " ," << serverUtil[i] << endl;
+  }
+  cout << endl;
 }

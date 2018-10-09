@@ -20,8 +20,9 @@ class server{
   int numServers;
   double *p;
   double serverUtil[3];
- std::queue <patient>queue;
-
+  std::queue <patient>queue;
+  std::vector<double>departList;
+  
  public:
     server(int,int,int,double[]);
   int getStatus(void);
@@ -34,7 +35,7 @@ class server{
   void setNextDep();
   double newArrive();
   void departure();
-  double patientDep(double);
+  void patientDep(double);
   double getServiceTime();
   int getNumDischarged();
   double getAvgDelay();
@@ -46,5 +47,6 @@ class server{
   void setNextMove();
   int getNextMove();
   void updateTotals(double, double);
-
+  void updateDepartureTime(double,int);
+  void report(double);
 };

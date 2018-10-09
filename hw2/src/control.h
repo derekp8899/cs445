@@ -24,13 +24,13 @@ class control{
 
   
  public:
-  control(int,int);
+  control();
   void simulate(void);
   static double genArrive(double);
   static double genService(double);
   void update(void);
   void decide(void);
-  void procArr(server *);
+  void procArr(server **);
   void procDepart(server **);
   char * sendReport(void);
   int getQueueSize();
