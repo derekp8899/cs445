@@ -191,7 +191,7 @@ if((*Servers[departFrom]).getNextMove()==0||departFrom!=0){
 char * control::sendReport(void){
   //generate the appropriate reports
 
-  char report[100];
+  char *report= malloc(100);
   //  strcpy(report,to_string(nextArrive));
   //sprintf(report,"%f",nextArrive);
   avgWait = (avgWait/numServed);
@@ -200,7 +200,7 @@ char * control::sendReport(void){
   avgQue = avgQue/simClock;//update the counters by dividing by the appropriate totals
   cout << fixed;
   cout << setprecision(2);
-  
+  /* //old hw1 outputs that need to be replaced  
   cout << "Mean Inter-Arrival time: " << intArrival << endl;
   cout << "Mean Service time : " << MST << endl;
   cout << "Length of Simulated time : " << simClock << endl;
@@ -209,6 +209,7 @@ char * control::sendReport(void){
   cout << "Number in queue after end of simulation : " << numInQue << endl;
   //send reports to the terminal
   return report;
+  */
 
 }
 double control::findDepart(server **servers){//check all servers for next departure time
