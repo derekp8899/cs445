@@ -1,0 +1,13 @@
+60 120 9 4                      // inventory, months, policies, possdemand sizes
+0.1 32.0 3.0 1.0 5.0 0.5 1.0    //mean inter demand, setup cost, incre cost, holding cost,shortage cost,min delay,max delay
+0.167 0.500 0.833 1.0           // prob for demand
+20        40                    //  s and S
+20        60
+20        80
+20       100
+40        60
+40        80
+40       100
+60        80
+60       100
+
