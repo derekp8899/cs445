@@ -1,6 +1,6 @@
 
 inv:src/inventory.o src/simlib.o
-	gcc src/inventory.o src/simlib.o -lm -o inv
+	gcc src/inventory.o src/simlib.o -lm -o inventory
 
 inventory:src/inventory.c
 	gcc src/inventory.c -c
