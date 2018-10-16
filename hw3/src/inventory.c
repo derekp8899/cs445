@@ -31,7 +31,7 @@ void report(void); //send the end report of the simulation (to output file or sc
 void init(void); // initialize all the variables for the inventory simulation(read input file)
 
 //define variables for the inventory simulation
-int amount, bigs[4], initialInv, invLevel, nextEventType, numEvents, numMonths, numValuesDemand, smalls[4], numPolicies,currentCase;
+int amount, bigs[9], initialInv, invLevel, nextEventType, numEvents, numMonths, numValuesDemand, smalls[9], numPolicies,currentCase;
 float meanInterDemand, setupCost, incCost, holdCost, shortCost, minLag, maxLag, probDistDemand[26], lastEvent, avgHold, avgShort, avgOrderCost;
 
 int main(int argc, char* argv[]){
@@ -39,21 +39,42 @@ int main(int argc, char* argv[]){
   //  init_simlib();
   init();
   printf("starting the simulation\n");
-  while(1){//start the simulation loop
-    timing();
-    updateStats();
-    if(next_event_type == 3)//check if we are ending the simulation
-      break;
-    else{ //else one of the main events
-      if(next_event_type == 1)
-	arrival();
-      if(next_event_type == 2)
-	order();
-      if(next_event_type == 4)
-	endMonth();
+  int i = 0;//counter for the number of policies to be tested
+  for(i = 0; i <numPolicies;i++){
+    printf(" bigs: %d smalls %d\n",bigs[currentCase],smalls[currentCase]);
+    while(1){//start the simulation loop
+      timing();
+      updateStats();
+      if(next_event_type == 3)//check if we are ending the simulation
+	break;
+      else{ //else one of the main events
+	if(next_event_type == 1)
+	  arrival();
+	if(next_event_type == 2){
+	  order();
+	  event_schedule((sim_time + expon(meanInterDemand, STREAM_DEMAND)),EVENT_ORDER);//schedule the nextt customer order event
+	}
+	if(next_event_type == 4)
+	  endMonth();
+      }
     }
+    report();
+    /*
+      re-initialize the simulation for the new policy to be simulated
+    */
+    currentCase++;
+    init_simlib();
+    numEvents = 4;
+    lastEvent = 0;
+    avgOrderCost, avgHold, avgShort = 0;
+    transfer[0] = initialInv; 
+    list_file(FIRST,INV_LIST);//use simlib list to store the inventory value
+    event_schedule(1.0e+30,EVENT_ARRIVAL);//no current incoming inventory
+    event_schedule((sim_time + expon(meanInterDemand, STREAM_DEMAND)),EVENT_ORDER);//schedule the first customer order event
+    event_schedule(numMonths, EVENT_END_SIM);//end of the simulation
+    event_schedule(0,EVENT_END_MONTH);//run this event first since a new month begins at the start of the simulation
+
   }
-  report();
 }
 
 void init(void){//initialize simlib and local variables(from input file), create initial events
@@ -68,14 +89,16 @@ void init(void){//initialize simlib and local variables(from input file), create
 	 &setupCost, &incCost, &holdCost, &shortCost, &minLag, &maxLag);
 
   int i;
-  for( i = 0; i < numValuesDemand;i++){
+  for( i = 1; i < numValuesDemand;i++){
 
     fscanf(in,"%f",&probDistDemand[i]);
 
   }
-  for(i = 0;i < numPolicies;i++){
+  float temp;
+  fscanf(in,"%f",&temp);
+  for(i = 0;i < numPolicies ;i++){
 
-    fscanf(in,"%d %d", &smalls[i],&bigs[i]);
+    fscanf(in,"%d %d",&smalls[i], &bigs[i]);
 
   }
   transfer[0] = initialInv; 
@@ -92,7 +115,7 @@ void init(void){//initialize simlib and local variables(from input file), create
   */
 }
 void endMonth(void){//end of a month event (type 4)
-
+  //printf("end of month\n");
   event_schedule((sim_time + 1), EVENT_END_MONTH);//schedule the end of month/beginng of the next month
   list_remove(FIRST,INV_LIST);
   float tempinv = transfer[0]; //temp variable for the inventory level;
@@ -100,6 +123,7 @@ void endMonth(void){//end of a month event (type 4)
     amount = bigs[currentCase] - tempinv;
     avgOrderCost += setupCost + (incCost * amount);
     event_schedule(sim_time + uniform(minLag, maxLag, STREAM_LAG), EVENT_ARRIVAL);
+    //printf("inventory ordered\n");
   }
   transfer[0] = tempinv;
   list_file(FIRST,INV_LIST);//readd inv to the list
@@ -107,17 +131,17 @@ void endMonth(void){//end of a month event (type 4)
 }
 
 void order (void){//order from customer event (type 2)
-
-  
+  //  printf("new order\n");
   list_remove(FIRST,INV_LIST);
-  //int orderSize =  random_integer(probDistDemand,STREAM_DEMAND);//need to ask about rand int function
-  transfer[0] -= 1;//update inventory and restore the list
+  int orderSize =  random_integer(probDistDemand,STREAM_DEMAND);//need to ask about rand int function
+  transfer[0] -=5;//update inventory and restore the list
+  //printf("inventory level : %f\n",transfer[0]);
   list_file(FIRST,INV_LIST);
-  
+
 }
 
 void arrival(void){ //arrival of new inventory from the supplier (type 1)
-
+  //  printf("arrival for new inventory\n");
   list_remove(FIRST,INV_LIST);
   float tempinv = transfer[0];
   tempinv += amount;
