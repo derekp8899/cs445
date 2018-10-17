@@ -33,14 +33,14 @@ void init(void); // initialize all the variables for the inventory simulation(re
 //define variables for the inventory simulation
 int amount, bigs[9], initialInv, invLevel, nextEventType, numEvents, numMonths, numValuesDemand, smalls[9], numPolicies,currentCase, totalOrders;
 float meanInterDemand, setupCost, incCost, holdCost, shortCost, minLag, maxLag, probDistDemand[26], lastEvent, avgHold, avgShort, avgOrderCost;
-
+FILE *out;
 int main(int argc, char* argv[]){
 
   init();
   printf("starting the simulation\n");
   int i = 0;//counter for the number of policies to be tested
   for(i = 0; i <numPolicies;i++){
-    printf("bigs: %d smalls %d\n",bigs[currentCase],smalls[currentCase]);
+    fprintf(out,"bigs: %d smalls %d for Case : %d\n",bigs[currentCase],smalls[currentCase],i);
     while(1){//start the simulation loop
       timing();
       updateStats();
@@ -79,10 +79,12 @@ int main(int argc, char* argv[]){
     event_schedule(0,EVENT_END_MONTH);//run this event first since a new month begins at the start of the simulation
 
   }
+  printf("\nSimulation Complete\nOutput saved to the file 'inv.out'\n\n");
 }
 
 void init(void){//initialize simlib and local variables(from input file), create initial events
-
+  system("touch inv.out");
+  out = fopen("inv.out","w");//create and open the output file
   init_simlib();
   numEvents = 4;
   lastEvent = 0;
@@ -171,19 +173,21 @@ void updateStats(void){ //update the simulation statistics
   list_file(FIRST,INV_LIST);//readd inv to the list
 }
 void report(void){
-
-  printf("Report for case %d\n",currentCase);
-  printf("non-simlib managed\n");
-  printf("Simulation ended after %.2f months\n",sim_time);
-  printf("Average Ordering Cost : %.3f\n",avgOrderCost/totalOrders);
-  printf("Average Holding Cost : %.3f\n",(avgHold*holdCost)/numMonths);
-  printf("Average Shortage Cost : %.3f\n",(avgShort*shortCost)/numMonths);
-  printf("\nsimlib managed statistics\n");
+  //system("touch inv.out");
+  //FILE *out = fopen("inv.out","w");
+  fprintf(out,"Report for case %d\n",currentCase);
+  fprintf(out,"non-simlib managed\n");
+  fprintf(out,"Simulation ended after %.2f months\n",sim_time);
+  fprintf(out,"Average Ordering Cost : %.3f\n",avgOrderCost/totalOrders);
+  fprintf(out,"Average Holding Cost : %.3f\n",(avgHold*holdCost)/numMonths);
+  fprintf(out,"Average Shortage Cost : %.3f\n",(avgShort*shortCost)/numMonths);
+  fprintf(out,"\nsimlib managed statistics\n");
   sampst(0,-1);
-  printf("Average Ordering Cost : %.3f\n",transfer[1]);
+  fprintf(out,"Average Ordering Cost : %.3f\n",transfer[1]);
   timest(0,-2);
-  printf("Average Holding Cost : %.3f\n",(transfer[1]*holdCost));
+  fprintf(out,"Average Holding Cost : %.3f\n",(transfer[1]*holdCost));
   timest(0,-3);
-  printf("Average Shortage Cost : %.3f\n",(transfer[1]*shortCost));
-  printf("\n");
+  fprintf(out,"Average Shortage Cost : %.3f\n",(transfer[1]*shortCost));
+  fprintf(out,"\n");
+  //fclose(out);
 }
