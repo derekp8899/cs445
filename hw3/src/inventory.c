@@ -31,17 +31,16 @@ void report(void); //send the end report of the simulation (to output file or sc
 void init(void); // initialize all the variables for the inventory simulation(read input file)
 
 //define variables for the inventory simulation
-int amount, bigs[9], initialInv, invLevel, nextEventType, numEvents, numMonths, numValuesDemand, smalls[9], numPolicies,currentCase;
+int amount, bigs[9], initialInv, invLevel, nextEventType, numEvents, numMonths, numValuesDemand, smalls[9], numPolicies,currentCase, totalOrders;
 float meanInterDemand, setupCost, incCost, holdCost, shortCost, minLag, maxLag, probDistDemand[26], lastEvent, avgHold, avgShort, avgOrderCost;
 
 int main(int argc, char* argv[]){
 
-  //  init_simlib();
   init();
   printf("starting the simulation\n");
   int i = 0;//counter for the number of policies to be tested
   for(i = 0; i <numPolicies;i++){
-    printf(" bigs: %d smalls %d\n",bigs[currentCase],smalls[currentCase]);
+    printf("bigs: %d smalls %d\n",bigs[currentCase],smalls[currentCase]);
     while(1){//start the simulation loop
       timing();
       updateStats();
@@ -66,7 +65,12 @@ int main(int argc, char* argv[]){
     init_simlib();
     numEvents = 4;
     lastEvent = 0;
-    avgOrderCost, avgHold, avgShort = 0;
+    totalOrders = 0;
+    sampst(0.0,0);
+    timest(0.0,0);
+    avgOrderCost=0;
+    avgHold=0;
+    avgShort = 0;
     transfer[0] = initialInv; 
     list_file(FIRST,INV_LIST);//use simlib list to store the inventory value
     event_schedule(1.0e+30,EVENT_ARRIVAL);//no current incoming inventory
@@ -83,19 +87,18 @@ void init(void){//initialize simlib and local variables(from input file), create
   numEvents = 4;
   lastEvent = 0;
   currentCase = 0;
+  totalOrders = 0;
   avgOrderCost, avgHold, avgShort = 0;
   FILE *in = fopen("inv.in","r");// read all the values in from the input file 'inv.in'
   fscanf(in, "%d %d %d %d %f %f %f %f %f %f %f", &initialInv,&numMonths,&numPolicies,&numValuesDemand,&meanInterDemand,
 	 &setupCost, &incCost, &holdCost, &shortCost, &minLag, &maxLag);
 
   int i;
-  for( i = 1; i < numValuesDemand;i++){
+  for( i = 1; i <= numValuesDemand;i++){
 
     fscanf(in,"%f",&probDistDemand[i]);
 
   }
-  float temp;
-  fscanf(in,"%f",&temp);
   for(i = 0;i < numPolicies ;i++){
 
     fscanf(in,"%d %d",&smalls[i], &bigs[i]);
@@ -115,7 +118,6 @@ void init(void){//initialize simlib and local variables(from input file), create
   */
 }
 void endMonth(void){//end of a month event (type 4)
-  //printf("end of month\n");
   event_schedule((sim_time + 1), EVENT_END_MONTH);//schedule the end of month/beginng of the next month
   list_remove(FIRST,INV_LIST);
   float tempinv = transfer[0]; //temp variable for the inventory level;
@@ -123,7 +125,8 @@ void endMonth(void){//end of a month event (type 4)
     amount = bigs[currentCase] - tempinv;
     avgOrderCost += setupCost + (incCost * amount);
     event_schedule(sim_time + uniform(minLag, maxLag, STREAM_LAG), EVENT_ARRIVAL);
-    //printf("inventory ordered\n");
+    totalOrders++;
+    sampst((setupCost + (incCost * amount)),AVG_ORDER);//average order tracking with simlib functions
   }
   transfer[0] = tempinv;
   list_file(FIRST,INV_LIST);//readd inv to the list
@@ -131,17 +134,16 @@ void endMonth(void){//end of a month event (type 4)
 }
 
 void order (void){//order from customer event (type 2)
-  //  printf("new order\n");
+
   list_remove(FIRST,INV_LIST);
   int orderSize =  random_integer(probDistDemand,STREAM_DEMAND);//need to ask about rand int function
-  transfer[0] -=5;//update inventory and restore the list
-  //printf("inventory level : %f\n",transfer[0]);
+  transfer[0] -=orderSize;//update inventory and restore the list
   list_file(FIRST,INV_LIST);
-
+  
 }
 
 void arrival(void){ //arrival of new inventory from the supplier (type 1)
-  //  printf("arrival for new inventory\n");
+
   list_remove(FIRST,INV_LIST);
   float tempinv = transfer[0];
   tempinv += amount;
@@ -158,17 +160,30 @@ void updateStats(void){ //update the simulation statistics
   lastEvent = sim_time; //set the new last event time for next loop cycle
   float tempinv = transfer[0];//temp variable to hold the current inventory level
   if(tempinv < 0){
-    //transfer[0] = tempinv * lastEventDelta;
     avgShort -= tempinv * lastEventDelta;
+    timest((tempinv)*-1,AVG_SHORT);
   }
   else if(tempinv > 0){
     avgHold += tempinv * lastEventDelta;
+    timest(tempinv,AVG_HOLD);
   }
   transfer[0] = tempinv;
   list_file(FIRST,INV_LIST);//readd inv to the list
 }
 void report(void){
 
-  printf("Simulation ended after %d months\n",numMonths);
-
+  printf("Report for case %d\n",currentCase);
+  printf("non-simlib managed\n");
+  printf("Simulation ended after %.2f months\n",sim_time);
+  printf("Average Ordering Cost : %.3f\n",avgOrderCost/totalOrders);
+  printf("Average Holding Cost : %.3f\n",(avgHold*holdCost)/numMonths);
+  printf("Average Shortage Cost : %.3f\n",(avgShort*shortCost)/numMonths);
+  printf("\nsimlib managed statistics\n");
+  sampst(0,-1);
+  printf("Average Ordering Cost : %.3f\n",transfer[1]);
+  timest(0,-2);
+  printf("Average Holding Cost : %.3f\n",(transfer[1]*holdCost));
+  timest(0,-3);
+  printf("Average Shortage Cost : %.3f\n",(transfer[1]*shortCost));
+  printf("\n");
 }
